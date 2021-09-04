@@ -6,7 +6,7 @@ import java.util.*
 interface IPlaylistRequester
 {
 
-    fun GetPlaylist(uuid: UUID): Playlist
+    fun GetPlaylist(uuid: UUID): Optional<Playlist>
 
     fun UpdatePlaylist(playlist: Playlist): Boolean
 }

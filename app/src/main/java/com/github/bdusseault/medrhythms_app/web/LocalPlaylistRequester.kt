@@ -17,19 +17,26 @@ class LocalPlaylistRequester(private val assetManager: AssetManager) : IPlaylist
 
     init
     {
-        assetManager.list("playlists/")?.forEach {
-            val inStream = BufferedReader(InputStreamReader(assetManager.open(it, AssetManager.ACCESS_BUFFER)))
+        val directory = "playlists/"
+        assetManager.list(directory)?.forEach {
+            val resource = directory + it
+            val inStream = BufferedReader(InputStreamReader(assetManager.open(resource, AssetManager.ACCESS_BUFFER)))
             val rawInput = inStream.lines().reduce { carry, nextLine -> carry + nextLine }
             inStream.close()
 
-            val playlist = PlaylistJSONParser.CreatePlaylist(rawInput.orElseThrow(Supplier { Exception("Failed to create Playlist from JSON input") }))
-            playlistUUIDMapping[playlist.UUID] = PlaylistFileEntry(it, playlist)
+            val playlist = PlaylistJSONParser.createPlaylist(rawInput.orElseThrow(Supplier { Exception("Failed to create Playlist from JSON input") }))
+            playlistUUIDMapping[playlist.UUID] = PlaylistFileEntry(resource, playlist)
         }
     }
 
-    override fun GetPlaylist(uuid: UUID): Playlist
+    override fun GetPlaylist(uuid: UUID): Optional<Playlist>
     {
-        return playlistUUIDMapping[uuid]!!.playlist
+        if(playlistUUIDMapping.containsKey(uuid))
+        {
+            return Optional.of(playlistUUIDMapping[uuid]!!.playlist)
+        }
+
+        return Optional.empty()
     }
 
     override fun UpdatePlaylist(playlist: Playlist): Boolean

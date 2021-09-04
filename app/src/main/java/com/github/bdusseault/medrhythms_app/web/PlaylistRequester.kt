@@ -7,7 +7,7 @@ import java.util.*
 class PlaylistRequester(val PlaylistUrl: URL) : IPlaylistRequester
 {
 
-    override fun GetPlaylist(uuid: UUID): Playlist
+    override fun GetPlaylist(uuid: UUID): Optional<Playlist>
     {
         TODO("Not yet implemented")
     }

@@ -11,11 +11,11 @@ class Playlist(
     class Track(
         val Source: String,
         val SourceExtID: String,
-        val Artist: String,
+        val Artist: Optional<String>,
         val TrackAnalysis: Analysis,
         val Title: String,
-        val Album: String,
-        val Genre: String,
+        val Album: Optional<String>,
+        val Genre: Optional<String>,
         val UUID: UUID,
         val Encoding: FileEncoding
     )
