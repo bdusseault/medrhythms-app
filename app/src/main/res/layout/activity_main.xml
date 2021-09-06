@@ -6,20 +6,43 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/playlist_view"
+    <FrameLayout
+        android:id="@+id/fragment_layout_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#009688"
-        android:clipChildren="true"
-        android:clipToPadding="true"
-        android:scrollbars="vertical"
-        app:layoutManager="LinearLayoutManager"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/fragment_layout_container">
 
-    </androidx.recyclerview.widget.RecyclerView>
+        <Button
+            android:id="@+id/test_button_frag1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Playlists"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/test_button_frag2"/>
+
+        <Button
+            android:id="@+id/test_button_frag2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tracks"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/test_button_frag1"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

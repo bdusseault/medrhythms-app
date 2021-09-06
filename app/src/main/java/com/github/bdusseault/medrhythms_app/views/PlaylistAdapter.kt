@@ -4,16 +4,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.github.bdusseault.medrhythms_app.R
 import com.github.bdusseault.medrhythms_app.data.Playlist
 
 
-class PlaylistMenuAdapter(private val data: List<Playlist>) : RecyclerView.Adapter<PlaylistMenuAdapter.ViewHolder>()
+class PlaylistAdapter(private val data: List<Playlist>, private val parent: PlaylistFragment) : RecyclerView.Adapter<PlaylistAdapter.ViewHolder>()
 {
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
+    inner class ViewHolder(view: View, ) : RecyclerView.ViewHolder(view)
     {
         val textView: TextView = view.findViewById(R.id.recycler_simple_text_row_entry)
+        lateinit var playlist: Playlist
+
+        init
+        {
+            view.setOnClickListener { parent.triggerOnClickListeners(playlist) }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
@@ -24,6 +32,7 @@ class PlaylistMenuAdapter(private val data: List<Playlist>) : RecyclerView.Adapt
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int)
     {
+        holder.playlist = data[position]
         holder.textView.text = data[position].Name
     }
 

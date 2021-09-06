@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="margin_xlarge">8dp</dimen>
+    <dimen name="margin_large">6dp</dimen>
     <dimen name="margin_medium">4dp</dimen>
-    <dimen name="list_item_height">60dp</dimen>
+    <dimen name="margin_small">2dp</dimen>
+    <dimen name="list_item_height_xlarge">80dp</dimen>
+    <dimen name="list_item_height_large">60dp</dimen>
+    <dimen name="list_item_height_medium">40dp</dimen>
+    <dimen name="list_item_height_small">20dp</dimen>
 </resources>
