@@ -5,7 +5,7 @@ import kotlin.collections.ArrayList
 
 object PlaylistManager
 {
-    private val Playlists: ArrayList<Playlist> = ArrayList()
+    private val Playlists: MutableList<Playlist> = ArrayList()
     private var CurrentPlaylistUUID: Optional<UUID> = Optional.empty()
 
     fun GetCurrentPlaylist(): Optional<Playlist>
@@ -34,6 +34,9 @@ object PlaylistManager
 
     fun AddPlaylist(playlist: Playlist)
     {
-        Playlists.add(playlist)
+        if(Playlists.filter { it.UUID == playlist.UUID }.isEmpty())
+        {
+            Playlists.add(playlist)
+        }
     }
 }

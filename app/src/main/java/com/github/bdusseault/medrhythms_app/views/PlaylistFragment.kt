@@ -23,8 +23,8 @@ class PlaylistFragment(private val playlistData: List<Playlist>) : Fragment(R.la
         super.onViewCreated(view, savedInstanceState)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.playlist_recycler)
-        recyclerView.adapter = PlaylistAdapter(playlistData, this)
-//        view.findViewById<RecyclerView>(R.id.playlist_recycler).addOnItemTouchListener()
+        //There'd be no sorting in a full implementation of this sort of app
+        recyclerView.adapter = PlaylistAdapter(playlistData.sortedBy { it.Name }, this)
     }
 
     fun registerOnItemClickListener(listener: OnClickListener)

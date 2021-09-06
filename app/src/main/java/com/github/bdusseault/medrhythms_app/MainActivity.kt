@@ -15,12 +15,13 @@ import com.github.bdusseault.medrhythms_app.web.IPlaylistRequester
 import com.github.bdusseault.medrhythms_app.web.LocalPlaylistRequester
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 class MainActivity : AppCompatActivity()
 {
     //Playlist data
     private val endpoint = "https://medrhythms.com/api/v1/playlists/"
-    private val playlistUUIDs: ArrayList<UUID> = ArrayList();
+    private val playlistUUIDs: MutableSet<UUID> = HashSet();
 //    private val playlistRequester: IPlaylistRequester = PlaylistRequester(URL(endpoint))
     private lateinit var playlistRequester: IPlaylistRequester
     private lateinit var playlistFragment: PlaylistFragment
@@ -48,23 +49,23 @@ class MainActivity : AppCompatActivity()
             }
             else if(playlistUUIDs.isNotEmpty())
             {
-                PlaylistManager.SetCurrentPlaylist(playlistUUIDs.component1())
+                PlaylistManager.SetCurrentPlaylist(playlistUUIDs.first())
             }
         }
         else
         {
             if(playlistUUIDs.isNotEmpty())
             {
-                PlaylistManager.SetCurrentPlaylist(playlistUUIDs.component1())
+                PlaylistManager.SetCurrentPlaylist(playlistUUIDs.first())
             }
         }
 
         playlistFragment = PlaylistFragment(PlaylistManager.GetPlaylists())
         playlistTracksFragment = PlaylistTracksFragment()
-        val curPlaylist = PlaylistManager.GetCurrentPlaylist()
-        if(curPlaylist.isPresent)
+        val currPlaylist = PlaylistManager.GetCurrentPlaylist()
+        if(currPlaylist.isPresent)
         {
-            playlistTracksFragment.tracks = curPlaylist.get().Tracks
+            playlistTracksFragment.tracks = currPlaylist.get().Tracks
         }
 
         playlistFragment.registerOnItemClickListener {
@@ -76,7 +77,7 @@ class MainActivity : AppCompatActivity()
             }
             else if(currPlaylist.get().UUID != it.UUID)
             {
-                currPlaylist.get().Tracks = ArrayList(playlistTracksFragment.tracks)
+                playlistRequester.UpdatePlaylist(currPlaylist.get())
                 PlaylistManager.SetCurrentPlaylist(it.UUID)
                 playlistTracksFragment.tracks = it.Tracks
             }
@@ -103,45 +104,6 @@ class MainActivity : AppCompatActivity()
                 addToBackStack(BACKSTACK_PLAYLIST)
             }
         }
-
-//        val playlistNav: RecyclerView = findViewById(R.id.playlist_view)
-//        playlistNav.adapter = PlaylistAdapter(PlaylistManager.GetPlaylists())
-//        playlistNav.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener
-//        {
-//            val gestureDetector = GestureDetector(applicationContext, object: GestureDetector.SimpleOnGestureListener()
-//            {
-//                override fun onSingleTapUp(e: MotionEvent?): Boolean
-//                {
-//                    return true
-//                }
-//
-//                override fun onContextClick(e: MotionEvent?): Boolean
-//                {
-//                    return true
-//                }
-//
-//                override fun onDown(e: MotionEvent?): Boolean
-//                {
-//                    return true
-//                }
-//            })
-//
-//            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean
-//            {
-//                return gestureDetector.onTouchEvent(e)
-//            }
-//
-//            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent)
-//            {
-//                val childView = rv.findChildViewUnder(e.x, e.y)
-//                if(childView != null)
-//                {
-//                    println("Test message!")
-//                }
-//            }
-//
-//            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) { }
-//        })
     }
 
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle)
@@ -153,6 +115,8 @@ class MainActivity : AppCompatActivity()
                 LAST_PLAYLIST_SELECTED,
                 curPlaylist.get().UUID.toString()
             )
+            curPlaylist.get().Tracks = ArrayList(playlistTracksFragment.tracks)
+            playlistRequester.UpdatePlaylist(curPlaylist.get())
         }
         super.onSaveInstanceState(outState, outPersistentState)
     }
