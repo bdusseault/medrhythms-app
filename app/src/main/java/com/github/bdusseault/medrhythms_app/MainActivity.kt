@@ -2,13 +2,11 @@ package com.github.bdusseault.medrhythms_app
 
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
 import com.github.bdusseault.medrhythms_app.data.PlaylistManager
 import com.github.bdusseault.medrhythms_app.helpers.PlaylistException
-import com.github.bdusseault.medrhythms_app.views.PlaylistAdapter
 import com.github.bdusseault.medrhythms_app.views.PlaylistFragment
 import com.github.bdusseault.medrhythms_app.views.PlaylistTracksFragment
 import com.github.bdusseault.medrhythms_app.web.IPlaylistRequester
@@ -17,11 +15,16 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
+/**
+ * Main activity for this app
+ * @author Bret Dusseault
+ * @since 9/6/2021
+ */
 class MainActivity : AppCompatActivity()
 {
     //Playlist data
     private val endpoint = "https://medrhythms.com/api/v1/playlists/"
-    private val playlistUUIDs: MutableSet<UUID> = HashSet();
+    private val playlistUUIDs: MutableSet<UUID> = HashSet()
 //    private val playlistRequester: IPlaylistRequester = PlaylistRequester(URL(endpoint))
     private lateinit var playlistRequester: IPlaylistRequester
     private lateinit var playlistFragment: PlaylistFragment
@@ -77,7 +80,8 @@ class MainActivity : AppCompatActivity()
             }
             else if(currPlaylist.get().UUID != it.UUID)
             {
-                playlistRequester.UpdatePlaylist(currPlaylist.get())
+                //Should be a little more performant that making update requests on drag & drops
+                playlistRequester.updatePlaylist(currPlaylist.get())
                 PlaylistManager.SetCurrentPlaylist(it.UUID)
                 playlistTracksFragment.tracks = it.Tracks
             }
@@ -116,7 +120,7 @@ class MainActivity : AppCompatActivity()
                 curPlaylist.get().UUID.toString()
             )
             curPlaylist.get().Tracks = ArrayList(playlistTracksFragment.tracks)
-            playlistRequester.UpdatePlaylist(curPlaylist.get())
+            playlistRequester.updatePlaylist(curPlaylist.get())
         }
         super.onSaveInstanceState(outState, outPersistentState)
     }
@@ -131,7 +135,7 @@ class MainActivity : AppCompatActivity()
     private fun populatePlaylistMenu()
     {
         playlistUUIDs.forEach {
-            PlaylistManager.AddPlaylist(playlistRequester.GetPlaylist(it).orElseThrow({PlaylistException("Could not build playlist!")}))
+            PlaylistManager.AddPlaylist(playlistRequester.getPlaylist(it).orElseThrow({PlaylistException("Could not build playlist!")}))
         }
     }
 }

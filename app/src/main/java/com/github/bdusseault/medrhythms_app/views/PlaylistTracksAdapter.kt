@@ -12,6 +12,12 @@ import com.github.bdusseault.medrhythms_app.data.Playlist
 import java.util.*
 import kotlin.math.ceil
 
+/**
+ * Adapter that implements Drag & Drop behaviors through [DragNDropHelperContract] and provides
+ * [DragNDropCallback] wrapper to utilize them
+ * @author Bret Dusseault
+ * @since 9/6/2021
+ */
 class PlaylistTracksAdapter(private var tracks: MutableList<Playlist.TrackEntry>) : RecyclerView.Adapter<PlaylistTracksAdapter.ViewHolder>(), DragNDropHelperContract<PlaylistTracksAdapter.ViewHolder>
 {
     class ViewHolder(val view: View) : RecyclerView.ViewHolder(view)
@@ -19,9 +25,9 @@ class PlaylistTracksAdapter(private var tracks: MutableList<Playlist.TrackEntry>
         val trackName: TextView = view.findViewById(R.id.playlist_item_track_name)
         val trackArtist: TextView = view.findViewById(R.id.playlist_item_track_artist)
         val trackDuration: TextView = view.findViewById(R.id.playlist_item_track_duration)
-
     }
 
+    //Creates normal looking play time text
     private val durationFormat = "%d:%02d"
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder
@@ -83,6 +89,11 @@ class PlaylistTracksAdapter(private var tracks: MutableList<Playlist.TrackEntry>
         viewHolder.view.setBackgroundColor(Color.WHITE)
     }
 
+    /**
+     * Wrapper class for [PlaylistTracksAdapter] to utilize drag & drop behaviors
+     * @author Bret Dusseault
+     * @since 9/6/2021
+     */
     class DragNDropCallback(private val adapter: DragNDropHelperContract<PlaylistTracksAdapter.ViewHolder>) : ItemTouchHelper.Callback()
     {
         override fun getMovementFlags(
@@ -110,7 +121,7 @@ class PlaylistTracksAdapter(private var tracks: MutableList<Playlist.TrackEntry>
             {
                 if(viewHolder is ViewHolder)
                 {
-                    adapter.onRowClear(viewHolder)
+                    adapter.onRowSelected(viewHolder)
                 }
             }
 

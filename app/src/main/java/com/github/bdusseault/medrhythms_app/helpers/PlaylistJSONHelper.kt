@@ -9,8 +9,17 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 
+/**
+ * Helper class for parsing [Playlist] to or from JSON
+ * @author Bret Dusseault
+ * @since 9/6/2021
+ */
 object PlaylistJSONHelper
 {
+    /**
+     * Expects a string-ified JSON body to create a playlist
+     * @param input JSON body
+     */
     fun createPlaylist(input: String): Playlist
     {
         if(input.isBlank())
@@ -30,7 +39,7 @@ object PlaylistJSONHelper
         for(i in 0 until playlistTracksArr.length())
         {
             val track = createTrack(playlistTracksArr.getJSONObject(i))
-            PlaylistDataProcessor.CleanBeatMap(track.Track)
+            PlaylistDataProcessor.cleanBeatMap(track.Track)
             playlistTracks.add(track)
         }
 
@@ -86,7 +95,11 @@ object PlaylistJSONHelper
             trackOrder)
     }
 
-    fun ConvertPlaylistToJSON(playlist: Playlist): JSONObject
+    /**
+     * Converts an existing playlist to its JSON representation
+     * @param playlist A playlist with any number of elements
+     */
+    fun convertPlaylistToJSON(playlist: Playlist): JSONObject
     {
         val rootObj = JSONObject()
 

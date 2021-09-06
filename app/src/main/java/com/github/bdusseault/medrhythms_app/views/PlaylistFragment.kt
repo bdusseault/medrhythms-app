@@ -9,6 +9,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.bdusseault.medrhythms_app.R
 import com.github.bdusseault.medrhythms_app.data.Playlist
 
+/**
+ * Fragment that contains a [RecyclerView] of [Playlist] objects and provides OnClick callbacks
+ * through [OnClickListener]
+ * @author Bret Dusseault
+ * @since 9/6/2021
+ */
 class PlaylistFragment(private val playlistData: List<Playlist>) : Fragment(R.layout.playlist_fragment)
 {
     fun interface OnClickListener
@@ -27,11 +33,19 @@ class PlaylistFragment(private val playlistData: List<Playlist>) : Fragment(R.la
         recyclerView.adapter = PlaylistAdapter(playlistData.sortedBy { it.Name }, this)
     }
 
+    /**
+     * Registers given listener, may allow duplicate registrations
+     * @param listener Listener that will be provided a [Playlist] when one is clicked
+     */
     fun registerOnItemClickListener(listener: OnClickListener)
     {
         onClickListeners.add(listener)
     }
 
+    /**
+     * Iterates through all registered [OnClickListener] and triggers them
+     * @param playlist A playlist that has been 'clicked'
+     */
     fun triggerOnClickListeners(playlist: Playlist)
     {
         onClickListeners.forEach { it.OnClick(playlist) }

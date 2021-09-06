@@ -2,18 +2,26 @@ package com.github.bdusseault.medrhythms_app.data
 
 import kotlin.math.round
 
+/**
+ * Helper object for processing data in [Playlist] objects
+ * @author Bret Dusseault
+ * @since 9/6/2021
+ */
 object PlaylistDataProcessor
 {
-    // Found at https://discuss.kotlinlang.org/t/how-do-you-round-a-number-to-n-decimal-places/8843
-    // while trying to figure out if there's a function in kotlin that already does this :/
-    private fun round(input: Float, decimals: Int): Float
+    private fun round(input: Float, places: Int): Float
     {
         var multiplier = 1.0f
-        repeat(decimals) {multiplier *= 10}
+        repeat(places) {multiplier *= 10}
         return round(input * multiplier) / multiplier
     }
 
-    fun CleanBeatMap(track: Playlist.Track)
+    /**
+     * Rounds all floats in [Playlist.Track.TrackAnalysis]'s beatmap to millisecond precision
+     * and updates FirstStrongBeatSec and LastStrongBeatSec to the appropriate values
+     * @param track An individual track from a playlist
+     */
+    fun cleanBeatMap(track: Playlist.Track)
     {
         track.TrackAnalysis.BeatMap = track.TrackAnalysis.BeatMap.map{ round(it, 3) }.toTypedArray()
         track.TrackAnalysis.FirstStrongBeatSec = track.TrackAnalysis.BeatMap[0]

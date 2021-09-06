@@ -10,6 +10,12 @@ import java.util.*
 import java.util.function.Supplier
 import kotlin.collections.HashMap
 
+/**
+ * Local asset implementation of [IPlaylistRequester] that caches playlists to emulate remote
+ * behaviors
+ * @author Bret Dusseault
+ * @since 9/6/2021
+ */
 class LocalPlaylistRequester(private val assetManager: AssetManager) : IPlaylistRequester
 {
     private val playlistUUIDMapping: HashMap<UUID, PlaylistFileEntry> = HashMap()
@@ -29,7 +35,7 @@ class LocalPlaylistRequester(private val assetManager: AssetManager) : IPlaylist
         }
     }
 
-    override fun GetPlaylist(uuid: UUID): Optional<Playlist>
+    override fun getPlaylist(uuid: UUID): Optional<Playlist>
     {
         if(playlistUUIDMapping.containsKey(uuid))
         {
@@ -39,7 +45,7 @@ class LocalPlaylistRequester(private val assetManager: AssetManager) : IPlaylist
         return Optional.empty()
     }
 
-    override fun UpdatePlaylist(playlist: Playlist): Boolean
+    override fun updatePlaylist(playlist: Playlist): Boolean
     {
         //changes are not persisted between app runs, because it's an asset and not the web API
         if(playlistUUIDMapping.containsKey(playlist.UUID))

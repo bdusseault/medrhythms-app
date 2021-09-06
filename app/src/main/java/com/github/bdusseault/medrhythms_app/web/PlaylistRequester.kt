@@ -6,10 +6,16 @@ import java.io.*
 import java.net.URL
 import java.util.*
 
+/**
+ * Web requester implementation of [IPlaylistRequester] that is unused because there is no
+ * valid endpoint to use for this demo
+ * @author Bret Dusseault
+ * @since 9/6/2021
+ */
 class PlaylistRequester(private val PlaylistUrl: String) : IPlaylistRequester
 {
 
-    override fun GetPlaylist(uuid: UUID): Optional<Playlist>
+    override fun getPlaylist(uuid: UUID): Optional<Playlist>
     {
         val connection = URL("${PlaylistUrl}${uuid}").openConnection()
         connection.doOutput = false
@@ -34,7 +40,7 @@ class PlaylistRequester(private val PlaylistUrl: String) : IPlaylistRequester
         return Optional.empty()
     }
 
-    override fun UpdatePlaylist(playlist: Playlist): Boolean
+    override fun updatePlaylist(playlist: Playlist): Boolean
     {
         val connection = URL("${PlaylistUrl}${playlist.UUID}").openConnection()
         connection.doOutput = true
@@ -43,7 +49,7 @@ class PlaylistRequester(private val PlaylistUrl: String) : IPlaylistRequester
         try
         {
             connection.connect()
-            val jsonPlaylist = PlaylistJSONHelper.ConvertPlaylistToJSON(playlist)
+            val jsonPlaylist = PlaylistJSONHelper.convertPlaylistToJSON(playlist)
             val outStream = BufferedWriter(OutputStreamWriter (connection.getOutputStream()))
             outStream.write(jsonPlaylist.toString())
             outStream.flush()

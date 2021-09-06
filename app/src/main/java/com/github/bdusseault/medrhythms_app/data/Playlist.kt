@@ -3,6 +3,12 @@ package com.github.bdusseault.medrhythms_app.data
 import java.time.LocalDateTime
 import java.util.*
 
+/**
+ * Data class for Playlists. Implements [Playlist.hashCode] and [Playlist.equals], including
+ * all member types and data classes
+ * @author Bret Dusseault
+ * @since 9/6/2021
+ */
 data class Playlist(
     val UUID: UUID, val Name: String, var Tracks: ArrayList<TrackEntry>,
     val CreationDate: LocalDateTime, var UpdateDate: LocalDateTime
