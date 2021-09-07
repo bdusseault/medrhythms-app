@@ -1,6 +1,7 @@
 package com.github.bdusseault.medrhythms_app.data
 
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.*
 
 /**
@@ -11,7 +12,7 @@ import java.util.*
  */
 data class Playlist(
     val UUID: UUID, val Name: String, var Tracks: ArrayList<TrackEntry>,
-    val CreationDate: LocalDateTime, var UpdateDate: LocalDateTime
+    val CreationDate: ZonedDateTime, var UpdateDate: ZonedDateTime
 )
 {
     data class Track(

@@ -5,6 +5,7 @@ import com.github.bdusseault.medrhythms_app.data.PlaylistDataProcessor
 import org.json.JSONArray
 import org.json.JSONObject
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
@@ -31,8 +32,8 @@ object PlaylistJSONHelper
         val playlistObj = baseObj.getJSONObject("playlist")
         val playlistUUID = UUID.fromString(playlistObj.getString("uuid"))
         val playlistName = playlistObj.getString("name")
-        val playlistCreateDate = LocalDateTime.parse(playlistObj.getString("created_at"), DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-        val playlistUpdateDate = LocalDateTime.parse(playlistObj.getString("updated_at"), DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        val playlistCreateDate = ZonedDateTime.parse(playlistObj.getString("created_at"), DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        val playlistUpdateDate = ZonedDateTime.parse(playlistObj.getString("updated_at"), DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
         val playlistTracksArr = playlistObj.getJSONArray("tracks")
         val playlistTracks: ArrayList<Playlist.TrackEntry> = ArrayList()
@@ -48,7 +49,7 @@ object PlaylistJSONHelper
 
     private fun createOptString(inString: String): Optional<String>
     {
-        return if (inString.isEmpty()) Optional.empty() else Optional.of(inString)
+        return if (inString.isEmpty() || inString == "null") Optional.empty() else Optional.of(inString)
     }
 
     private fun createTrack(inputJson: JSONObject): Playlist.TrackEntry
@@ -60,8 +61,8 @@ object PlaylistJSONHelper
         val trackSourceExtId = trackObj.getString("source_track_ext_id")
         val trackArtist = createOptString(trackObj.getString("artist"))
         val trackTitle = trackObj.getString("title")
-        val trackAlbum = createOptString(trackObj.optString("album", ""))
-        val trackGenre = createOptString(trackObj.optString("genre", ""))
+        val trackAlbum = createOptString(trackObj.getString("album"))
+        val trackGenre = createOptString(trackObj.getString("genre"))
         val trackUUID = UUID.fromString(trackObj.getString("uuid"))
 
         val trackAnalysisObj = trackObj.getJSONObject("track_analysis")
@@ -79,7 +80,7 @@ object PlaylistJSONHelper
 
         val trackFileEncodingObj = trackObj.getJSONObject("file_encoding")
         val trackFileEncodingType = trackFileEncodingObj.getString("type")
-        val trackFileEncodingBitrate = trackFileEncodingObj.getString("type")
+        val trackFileEncodingBitrate = trackFileEncodingObj.getString("bitrate")
         val trackFileEncodingChannels = trackFileEncodingObj.getInt("channels")
         val trackFileEncodingEncoding = trackFileEncodingObj.getString("encoding")
         val trackFileEncodingSampleRate = trackFileEncodingObj.getInt("sample_rate")
@@ -106,22 +107,57 @@ object PlaylistJSONHelper
         val playlistObj = JSONObject()
         playlistObj.put("uuid", playlist.UUID.toString())
         playlistObj.put("name", playlist.Name)
-        playlistObj.put("created_at", DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(playlist.CreationDate))
-        playlistObj.put("updated_at", DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(playlist.UpdateDate))
 
         val playlistTrackArr = JSONArray()
         for (entry: Playlist.TrackEntry in playlist.Tracks)
         {
             val trackEntryObj = JSONObject()
-            trackEntryObj.put("order", entry.Ordering)
 
             val trackObj = JSONObject()
             trackObj.put("source", entry.Track.Source)
             trackObj.put("source_track_ext_id", entry.Track.SourceExtID)
-            trackObj.putOpt("artist", entry.Track.Artist.orElse(null))
+            if(entry.Track.Artist.isPresent)
+            {
+                trackObj.put("artist", entry.Track.Artist.get())
+            }
+            else
+            {
+                trackObj.put("artist", JSONObject.NULL)
+            }
+
+            val trackAnalysisObj = JSONObject()
+            trackAnalysisObj.put("analysis_version", entry.Track.TrackAnalysis.Version)
+            trackAnalysisObj.put("analysis_time", "%.5f".format(entry.Track.TrackAnalysis.Time))
+            trackAnalysisObj.put("sample_count", entry.Track.TrackAnalysis.SampleCount)
+            trackAnalysisObj.put("bpm", entry.Track.TrackAnalysis.BPM.toString())
+            trackAnalysisObj.put("first_strong_beat_sec", "%.3f".format(entry.Track.TrackAnalysis.FirstStrongBeatSec))
+            trackAnalysisObj.put("last_strong_beat_sec", "%.3f".format(entry.Track.TrackAnalysis.LastStrongBeatSec))
+            val trackAnalysisBeatmapArr = JSONArray()
+            for(f: Float in entry.Track.TrackAnalysis.BeatMap)
+            {
+                trackAnalysisBeatmapArr.put("%.3f".format(f))
+            }
+            trackAnalysisObj.put("beat_map", trackAnalysisBeatmapArr)
+            trackAnalysisObj.put("duration_sec", "%.5f".format(entry.Track.TrackAnalysis.Duration))
+            trackObj.put("track_analysis", trackAnalysisObj)
+
             trackObj.put("title", entry.Track.Title)
-            trackObj.putOpt("album", entry.Track.Album.orElse(null))
-            trackObj.putOpt("genre", entry.Track.Genre.orElse(null))
+            if(entry.Track.Album.isPresent)
+            {
+                trackObj.put("album", entry.Track.Album.get())
+            }
+            else
+            {
+                trackObj.put("album", JSONObject.NULL)
+            }
+            if(entry.Track.Genre.isPresent)
+            {
+                trackObj.put("genre", entry.Track.Genre.get())
+            }
+            else
+            {
+                trackObj.put("genre", JSONObject.NULL)
+            }
             trackObj.put("uuid", entry.Track.UUID.toString())
 
             val trackEncodingObj = JSONObject()
@@ -132,26 +168,15 @@ object PlaylistJSONHelper
             trackEncodingObj.put("sample_rate", entry.Track.Encoding.SampleRate)
             trackObj.put("file_encoding", trackEncodingObj)
 
-            val trackAnalysisObj = JSONObject()
-            trackAnalysisObj.put("analysis_version", entry.Track.TrackAnalysis.Version)
-            trackAnalysisObj.put("analysis_time", entry.Track.TrackAnalysis.Time)
-            trackAnalysisObj.put("sample_count", entry.Track.TrackAnalysis.SampleCount)
-            trackAnalysisObj.put("bpm", entry.Track.TrackAnalysis.BPM)
-            trackAnalysisObj.put("first_strong_beat_sec", entry.Track.TrackAnalysis.FirstStrongBeatSec)
-            trackAnalysisObj.put("last_strong_beat_sec", entry.Track.TrackAnalysis.LastStrongBeatSec)
-            trackAnalysisObj.put("duration_sec", entry.Track.TrackAnalysis.Duration)
-            val trackAnalysisBeatmapArr = JSONArray()
-            for(f: Float in entry.Track.TrackAnalysis.BeatMap)
-            {
-                trackAnalysisBeatmapArr.put(f.toDouble())
-            }
-            trackAnalysisObj.put("beat_map", trackAnalysisBeatmapArr)
-            trackObj.put("track_analysis", trackAnalysisObj)
 
             trackEntryObj.put("track", trackObj)
+            trackEntryObj.put("order", entry.Ordering)
             playlistTrackArr.put(trackEntryObj)
         }
         playlistObj.put("tracks", playlistTrackArr)
+
+        playlistObj.put("created_at", DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(playlist.CreationDate))
+        playlistObj.put("updated_at", DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(playlist.UpdateDate))
 
         rootObj.put("playlist", playlistObj)
 
