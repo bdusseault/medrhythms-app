@@ -29,4 +29,9 @@ object PlaylistDataProcessor
         track.TrackAnalysis.FirstStrongBeatSec = track.TrackAnalysis.BeatMap[0]
         track.TrackAnalysis.LastStrongBeatSec = track.TrackAnalysis.BeatMap[track.TrackAnalysis.BeatMap.size-1]
     }
+
+    fun cutOffHalfBeats(track: Playlist.Track)
+    {
+        track.TrackAnalysis.BeatMap = track.TrackAnalysis.BeatMap.sliceArray(track.TrackAnalysis.BeatMap.indices.filter { it % 2 == 0 })
+    }
 }

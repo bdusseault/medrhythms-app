@@ -20,6 +20,7 @@ class PlaylistAdapter(private val data: List<Playlist>, private val parent: Play
     inner class ViewHolder(view: View, ) : RecyclerView.ViewHolder(view)
     {
         val textView: TextView = view.findViewById(R.id.recycler_simple_text_row_entry)
+        val updateTimeTextView: TextView = view.findViewById(R.id.update_time_text)
         //Will get set by parent when this viewholder gets bound
         lateinit var playlist: Playlist
 
@@ -40,6 +41,7 @@ class PlaylistAdapter(private val data: List<Playlist>, private val parent: Play
     {
         holder.playlist = data[position]
         holder.textView.text = data[position].Name
+        holder.updateTimeTextView.text = data[position].UpdateDate.toString()
     }
 
     override fun getItemCount(): Int = data.size
